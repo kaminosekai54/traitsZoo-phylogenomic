@@ -51,11 +51,10 @@ def renameSeqInFasta(fastaFile, fastaDict={}):
     if len(fastaDict) == 0 : dict = fastaToDict(fastaFile)
     else : dict = fastaDict
     
-    # dict = {"seqId": dict.keys(), "sequence": dict.values()}
     df = pd.DataFrame(zip(dict.keys(), dict.values()))
     if not os.path.isdir("data/") : os.mkdir("data/")
     if not os.path.isdir("data/fasta_files") : os.mkdir("data/fasta_files")
-    df.to_csv("data/fasta_files/" + speciesName + ".tab", sep= "\t", index=False)
+    df.to_csv("data/fasta_files/" + speciesName + ".tab", sep= "\t", index=False, header=False)
     SeqIO.convert("data/fasta_files/" + speciesName + ".tab", 'tab', "data/fasta_files/" + speciesName + ".fasta", 'fasta-2line')
     os.remove("data/fasta_files/" + speciesName + ".tab")
     print("sequence id renamed for ", speciesName)
