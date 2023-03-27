@@ -71,18 +71,7 @@ def renameSeqInFasta(fastaFile, fastaDict={}):
     os.remove(settings["path"]["renamedFasta"] + speciesName + ".tab")
     print("sequence id renamed for ", speciesName)
 
-# main function
-def main():
-    if len(sys.argv) == 1 :
-        convertAll() 
-    elif len(sys.argv) == 2:
-        fastaDict = fastaToDict(sys.argv[1])
-        renameSeqInFasta(sys.argv[1], fastaDict)
-        fastaToTSV(sys.argv[1], fastaDict)
-    elif len(sys.argv) == 3:
-        if int(sys.argv[2]) == 1: renameSeqInFasta(sys.argv[1])
-        elif int(sys.argv[2]) == 2 : fastaToTSV(sys.argv[1])
-    return
+
 
 # function processFile,
 # This function creat a tsv and renamed fasta for the given file,
@@ -100,6 +89,20 @@ def processFile(fastaFile):
 def convertAll():
     with Pool() as p:
         p.map(processFile, [settings["path"]["rawData"] +file for file in os.listdir(settings["path"]["rawData"])])
+
+
+# main function
+def main():
+    if len(sys.argv) == 1 :
+        convertAll() 
+    elif len(sys.argv) == 2:
+        fastaDict = fastaToDict(sys.argv[1])
+        renameSeqInFasta(sys.argv[1], fastaDict)
+        fastaToTSV(sys.argv[1], fastaDict)
+    elif len(sys.argv) == 3:
+        if int(sys.argv[2]) == 1: renameSeqInFasta(sys.argv[1])
+        elif int(sys.argv[2]) == 2 : fastaToTSV(sys.argv[1])
+    return
 
 if __name__ == '__main__':
     main()
