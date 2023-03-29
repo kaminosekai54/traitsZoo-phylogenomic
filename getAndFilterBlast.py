@@ -23,17 +23,12 @@ def indexFile(refFile):
         t1 = time.time()
         file= refFile[refFile.rfind("/")+1: refFile.rfind(".")]
         cmd = ["diamond", "makedb", "--in", refFile, "-d", settings["path"]["indexedFiles"] + file]
-        print(cmd)
-        # with open(settings["path"]["indexedFiles"] + file + ".sh", "w") as bashFile : bashFile.write("#!/bin/bash \n" + cmd)
-        # with open(settings["path"]["indexedFiles"] + file + ".sh", "w") as bashFile : bashFile.write("#!/bin/bash \n pwd")
-        # right = subprocess.run(["chmod", "777", settings["path"]["indexedFiles"] + file + ".sh"], text=True)
-        # print(right)
-        # bash= subprocess.check_call(settings["path"]["indexedFiles"] + file + ".sh")
-        # print(bash)
+        # cmd = ["makeblastdb", "-dbtype", "prot", "-in", refFile, "-out", settings["path"]["indexedFiles"] + file]
+        # print(cmd)
 
         child= subprocess.check_output(cmd, text=True)
         t2 = time.time()
-        print("indexation done for " + refFile+ " in " + str((t2-t1)/60) + " sec")
+        # print("indexation done for " + refFile+ " in " + str((t2-t1)/60) + " sec")
     else: print("no file found")
 
 # function indexAllFile,
@@ -61,11 +56,13 @@ def blastRefToOther(dbFile, querryFile= settings["path"]["renamedFasta"]+ settin
         outputFile=settings["path"]["diamondMatchs"] + querryFile[querryFile.rfind("/")+1: querryFile.rfind(".")] + "-matchs-in-" + dbFile[dbFile.rfind("/")+1: dbFile.rfind(".")] + ".tsv"
         # cmd = ["./diamond", "blastp", "-q", querryFile, "-d", dbFile, "-o", outputFile, "--max-target-seqs", "1", "--outfmt", "6", "qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"]
         cmd = ["diamond", "blastp", "-q", querryFile, "-d", dbFile, "-o", outputFile, "--max-target-seqs", "1", "--outfmt", "6", "qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"]
-        print(cmd)
+        # cmd = ["blastp", "-seg", "yes", "-soft_masking", "true", "-use_sw_tback", "-db", dbFile, "-query", querryFile, "-out", outputFile, "-max_target_seqs", "1", "-outfmt", "6", "qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"]
+        # print(cmd)
 
         child= subprocess.check_output(cmd , text=True)
+        print(child)
         t2 = time.time()
-        print("blast search completedfor " + querryFile + " in ", dbFile + " in " + str((t2-t1)/60) + " sec")
+        # print("blast search completedfor " + querryFile + " in ", dbFile + " in " + str((t2-t1)/60) + " sec")
     else: print("no file found")
 
 
@@ -82,11 +79,11 @@ def blastOtherToRef(querryFile, dbFile= settings["path"]["indexedFiles"]+ settin
         outputFile=settings["path"]["diamondMatchs"] + querryFile[querryFile.rfind("/")+1: querryFile.rfind(".")] + "-matchs-in-" + dbFile[dbFile.rfind("/")+1: dbFile.rfind(".")] + ".tsv"
         # cmd = ["./diamond", "blastp", "-q", querryFile, "-d", dbFile, "-o", outputFile, "--max-target-seqs", "1", "--outfmt", "6", "qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"]
         cmd = ["diamond", "blastp", "-q", querryFile, "-d", dbFile, "-o", outputFile, "--max-target-seqs", "1", "--outfmt", "6", "qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"]
-        print(cmd)
+        # print(cmd)
 
         child= subprocess.check_output(cmd , text=True)
         t2 = time.time()
-        print("blast search completedfor " + querryFile + " in ", dbFile + " in " + str((t2-t1)/60) + " sec")
+        # print("blast search completedfor " + querryFile + " in ", dbFile + " in " + str((t2-t1)/60) + " sec")
     else: print("one of the file is missing")
 
 # function allBlastSearch,

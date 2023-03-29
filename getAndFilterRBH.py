@@ -20,17 +20,18 @@ settings= settings.getSettings()
 # @param
 # @matchCouple, a tupple of diamond output file
 # @return, return a pandas data frame containing the BRH fount in the couple of file
-def getBRH(matchCouple):
-    df1 = pd.read_csv(matchCouple[0], sep="\t", names=["qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"])
-    df2 = pd.read_csv(matchCouple[1], sep="\t", names=["qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"])
+def getBRH(args):
+    filter =False
+    if len(args) == 3 : filter = args[2]
+    df1 = pd.read_csv(args[0], sep="\t", names=["qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"])
+    df2 = pd.read_csv(args[1], sep="\t", names=["qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"])
     df1 = df1.assign(brhCouple = df1.qseqid + "__" +df1.sseqid)
     df2 = df2.assign(brhCouple = df2.sseqid + "__" +df2.qseqid)
-    # brhList2 = list(zip(df2.qseqid.tolist(), df2.sseqid.tolist()))
-    # realBrhDict= {qId:sId for (qId, sId) in brhList1 if (sId, qId) in brhList2}
-    dfBRH = df1[(df1.brhCouple.isin(df2.brhCouple.tolist())) & (df1.pident > 30) & (df1.evalue < 1e-6)]
-    
-    dfBRH = dfBRH.assign(minSeqLen = dfBRH[["qlen", "slen"]].min(axis=1))
-    dfBRH = dfBRH[dfBRH.length >= dfBRH.minSeqLen *0.6 ]
+    dfBRH = df1[(df1.brhCouple.isin(df2.brhCouple.tolist()))]
+    if filter :
+        dfBRH = df1[(df1.brhCouple.isin(df2.brhCouple.tolist())) & (df1.pident > 30) & (df1.evalue < 1e-6)]
+        dfBRH = dfBRH.assign(minSeqLen = dfBRH[["qlen", "slen"]].min(axis=1))
+        dfBRH = dfBRH[dfBRH.length >= dfBRH.minSeqLen *0.6 ]
     dfBRH = dfBRH[["qseqid","sseqid","full_qseq","full_sseq"]]
     # dfBRH=dfBRH.set_index(dfBRH.qseqid)
     
@@ -71,7 +72,7 @@ def mergeBrhDF(df1, df2, colNotToMerge):
 # @df, the dataframe on whish to apply the filter,
 # @colNotToMerge, a list of column name not to merge
 # @return the filtered data frame
-def finalFilter(df, colNotToMerge):
+def finalFilter(df, colNotToMerge, outputFolder = settings["path"]["filteredRBH"]):
     nbRBHRequiered = len(os.listdir(settings["path"]["renamedFasta"])) -1
     for col in df.columns:
         if col not in colNotToMerge:
@@ -81,14 +82,17 @@ def finalFilter(df, colNotToMerge):
 
     if not os.path.isdir(settings["path"]["data"]) : os.mkdir(settings["path"]["data"])
     if not os.path.isdir(settings["path"]["RBH"]) : os.mkdir(settings["path"]["RBH"])
-    df.to_csv(settings["path"]["RBH"] + "full_rbh_tab.tsv", sep="\t", index=False)
+    if not os.path.isdir(outputFolder) : os.mkdir(outputFolder)
+    df.to_csv(outputFolder+ "full_rbh_tab.tsv", sep="\t", index=False)
     return df[["qseqid","sseqid","full_qseq","full_sseq"]]
 
 # function createRBHFile,
 # this function creat a fasta file containing a sequence of the reference proteom and all its BRH.
 # @param,
 # @row, a dictionnary like object, basically a row of the final rbh data frame
-def createRBHFile(row):
+def createRBHFile(args):
+    row = args[0]
+    outputFolder = args[1]
     t1= time.time()
     reccordList = [SeqRecord(Seq(row["full_qseq"]), id = row["qseqid"], description="")]
     for seqId, sSeq in zip(row["sseqid"], row["full_sseq"]):
@@ -96,10 +100,11 @@ def createRBHFile(row):
 
     if not os.path.isdir(settings["path"]["data"]) : os.mkdir(settings["path"]["data"])
     if not os.path.isdir(settings["path"]["RBH"]) : os.mkdir(settings["path"]["RBH"])
+    if not os.path.isdir(outputFolder) : os.mkdir(outputFolder)
     fileName = row["qseqid"] + "_rbhs_pep.fasta" 
-    SeqIO.write(reccordList, settings["path"]["RBH"] + fileName, "fasta-2line")
+    SeqIO.write(reccordList, outputFolder+ fileName, "fasta-2line")
     t2 = time.time()
-    print("RBH Fasta created : " + settings["path"]["RBH"] + fileName + " in " + str((t2-t1)/60) + " sec")
+    # print("RBH Fasta created : " + settings["path"]["RBH"] + fileName + " in " + str((t2-t1)/60) + " sec")
     return fileName
 
 # function createAllRBHFile,
@@ -107,11 +112,11 @@ def createRBHFile(row):
 # in a parallele way
 # @param
 # @df, the data frame on wish to call the function
-def createAllRBHFile(df):
+def createAllRBHFile(df, outputFolder = settings["path"]["filteredRBH"]):
     t1 = time.time()
     fileList = []
     with Pool() as p:
-        fileList = p.map(createRBHFile, [v for k,v in df.iterrows()])
+        fileList = p.map(createRBHFile, [(v, outputFolder) for k,v in df.iterrows()])
     t2 = time.time()
     print(str(len(fileList)) + " rbh files created in " + str((t2-t1)/60) + " sec")
 
@@ -131,18 +136,24 @@ def getAllBRH():
             elif settings["referenceProteom"] in s2:
                 couple = (s2 + "-matchs-in-"+ s1 +".tsv", file)
             if not couple in coupleList and not (couple[1], couple[0]) in coupleList: coupleList.append(couple)
-    finalRBHDf= pd.DataFrame.from_dict({"qseqid":"",  "sseqid":[],  "full_qseq":[], "full_sseq":[]})
+    finalRawRBHDf= pd.DataFrame.from_dict({"qseqid":"",  "sseqid":[],  "full_qseq":[], "full_sseq":[]})
+    finalFilteredRBHDf= pd.DataFrame.from_dict({"qseqid":"",  "sseqid":[],  "full_qseq":[], "full_sseq":[]})
     colNotToMerge = ["qseqid","full_qseq"]
-    rbhDfList = []
+    rawRBHDfList = []
+    filteredRBHDfList = []
     with Pool() as p:
-        rbhDfList = p.map(getBRH, [(settings["path"]["diamondMatchs"] + c1, settings["path"]["diamondMatchs"] +c2)for c1, c2 in coupleList])
-    # for couple in coupleList:
-        # finalRBHDf= mergeBrhDF(finalRBHDf, getBRH(settings["path"]["diamondMatchs"] + couple[0], settings["path"]["diamondMatchs"]+ couple[1]), colNotToMerge)
-    for rbhDf in rbhDfList:
-        finalRBHDf = mergeBrhDF(finalRBHDf, rbhDf, colNotToMerge)
-    finalRBHDf = finalFilter(finalRBHDf, colNotToMerge)
-    print(finalRBHDf)
-    createAllRBHFile(finalRBHDf)
+        rawRBHDfList = p.map(getBRH, [(settings["path"]["diamondMatchs"] + c1, settings["path"]["diamondMatchs"] +c2)for c1, c2 in coupleList])
+        filteredRBHDfList = p.map(getBRH, [(settings["path"]["diamondMatchs"] + c1, settings["path"]["diamondMatchs"] +c2, True) for c1, c2 in coupleList])
+    for rbhDf in rawRBHDfList:
+        finalRawRBHDf= mergeBrhDF(finalRawRBHDf, rbhDf, colNotToMerge)
+
+    for rbhDf in filteredRBHDfList:
+        finalFilteredRBHDf = mergeBrhDF(finalFilteredRBHDf, rbhDf, colNotToMerge)
+    finalRawRBHDf= finalFilter(finalRawRBHDf, colNotToMerge, outputFolder=settings["path"]["rawRBH"] )
+    finalFilteredRBHDf = finalFilter(finalFilteredRBHDf, colNotToMerge)
+    # print(finalFilteredRBHDf)
+    createAllRBHFile(finalRawRBHDf, settings["path"]["rawRBH"] )
+    createAllRBHFile(finalFilteredRBHDf, settings["path"]["filteredRBH"])
 
 if __name__ == '__main__':
     getAllBRH()
