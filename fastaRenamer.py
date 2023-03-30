@@ -1,5 +1,5 @@
 # imports
-import os, sys
+import os, sys, time
 import pandas as pd
 from Bio import SeqIO
 from Bio.Seq import Seq
