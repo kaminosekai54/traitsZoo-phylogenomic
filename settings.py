@@ -3,8 +3,9 @@ settings ={
 "rawData": "rawData/",
 "data": "data/"
 },
-"referenceProteom":"Amphibalanus-amphitrite"
-# "referenceProteom":"Oithona-nana"
+"referenceProteom":"Amphibalanus-amphitrite",
+# "referenceProteom":"Oithona-nana",
+"pathToTrimal": "~/trimAl/source/"
 }
 
 settings["path"]["renamedFasta"] = settings["path"]["data"] + "fastaFiles/"
@@ -16,6 +17,8 @@ settings["path"]["RBH"] = settings["path"]["data"] + "RBH/"
 settings["path"]["rawRBH"] = settings["path"]["RBH"] + "raw/"
 settings["path"]["filteredRBH"] = settings["path"]["RBH"] + "filtered/"
 settings["path"]["alignments"]= settings["path"]["data"] + "alignments/"
+settings["path"]["rawAlignments"]= settings["path"]["alignments"] + "raw/"
+settings["path"]["trimmedAlignments"]= settings["path"]["alignments"] + "trimmed/"
 settings["path"]["trees"] =settings["path"]["data"] + "trees/",
 
 
