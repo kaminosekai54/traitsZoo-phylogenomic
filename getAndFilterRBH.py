@@ -29,7 +29,7 @@ def getBRH(args):
     df2 = df2.assign(brhCouple = df2.sseqid + "__" +df2.qseqid)
     dfBRH = df1[(df1.brhCouple.isin(df2.brhCouple.tolist()))]
     if filter :
-        dfBRH = df1[(df1.brhCouple.isin(df2.brhCouple.tolist())) & (df1.pident > 30) & (df1.evalue < 1e-6)]
+        dfBRH = df1[(df1.brhCouple.isin(df2.brhCouple.tolist())) & (df1.pident >= 30) & (df1.evalue < 1e-5)]
         dfBRH = dfBRH.assign(minSeqLen = dfBRH[["qlen", "slen"]].min(axis=1))
         dfBRH = dfBRH[dfBRH.length >= dfBRH.minSeqLen *0.6 ]
     dfBRH = dfBRH[["qseqid","sseqid","full_qseq","full_sseq"]]

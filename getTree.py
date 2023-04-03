@@ -28,9 +28,10 @@ def concatAllRBH():
     if not os.path.isdir(settings["path"]["trees"]) : os.mkdir(settings["path"]["trees"])
     t1 = time.time()
     dictList = []
+    concatDict= {}
     with Pool() as p:
         dictList =p.map(getDictFromFasta, [settings["path"]["trimmedAlignments"]+ file for file in os.listdir(settings["path"]["trimmedAlignments"]) if file.endswith(".fasta")])
-    concatDict = {concatDict + d for d in dictList}
+    for d in dictList: concatDict = concatDict | d
     concatDf = pd.DataFrame.from_dict({"seqId": concatDict.keys(), "seq": concatDict.values()})
     concatDf.to_csv(settings["path"]["trees"] + "concatenatedRBHAlignments.tab", sep= "\t", index=False, header=False)
     SeqIO.convert(settings["path"]["trees"] + "concatenatedRBHAlignments.tab", 'tab', settings["path"]["trees"] + "concatenatedRBHAlignments.fasta", 'fasta-2line')
@@ -53,4 +54,4 @@ def generateTree(concatenatedAlignmentFile):
 
 if __name__ == '__main__':
     concatAllRBH()
-    generateTree()
+    #generateTree()

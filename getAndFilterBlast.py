@@ -55,7 +55,7 @@ def blastRefToOther(dbFile, querryFile= settings["path"]["renamedFasta"]+ settin
         t1 = time.time()
         outputFile=settings["path"]["diamondMatchs"] + querryFile[querryFile.rfind("/")+1: querryFile.rfind(".")] + "-matchs-in-" + dbFile[dbFile.rfind("/")+1: dbFile.rfind(".")] + ".tsv"
         # cmd = ["./diamond", "blastp", "-q", querryFile, "-d", dbFile, "-o", outputFile, "--max-target-seqs", "1", "--outfmt", "6", "qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"]
-        cmd = ["diamond", "blastp", "-q", querryFile, "-d", dbFile, "-o", outputFile, "--max-target-seqs", "1", "--outfmt", "6", "qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"]
+        cmd = ["diamond", "blastp", "--very-sensitive", "-q", querryFile, "-d", dbFile, "-o", outputFile, "--max-target-seqs", "1", "--outfmt", "6", "qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"]
         # cmd = ["blastp", "-seg", "yes", "-soft_masking", "true", "-use_sw_tback", "-db", dbFile, "-query", querryFile, "-out", outputFile, "-max_target_seqs", "1", "-outfmt", "6", "qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"]
         # print(cmd)
 
@@ -78,7 +78,7 @@ def blastOtherToRef(querryFile, dbFile= settings["path"]["indexedFiles"]+ settin
         t1 = time.time()
         outputFile=settings["path"]["diamondMatchs"] + querryFile[querryFile.rfind("/")+1: querryFile.rfind(".")] + "-matchs-in-" + dbFile[dbFile.rfind("/")+1: dbFile.rfind(".")] + ".tsv"
         # cmd = ["./diamond", "blastp", "-q", querryFile, "-d", dbFile, "-o", outputFile, "--max-target-seqs", "1", "--outfmt", "6", "qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"]
-        cmd = ["diamond", "blastp", "-q", querryFile, "-d", dbFile, "-o", outputFile, "--max-target-seqs", "1", "--outfmt", "6", "qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"]
+        cmd = ["diamond", "blastp", "--very-sensitive", "-q", querryFile, "-d", dbFile, "-o", outputFile, "--max-target-seqs", "1", "--outfmt", "6", "qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"]
         # print(cmd)
 
         child= subprocess.check_output(cmd , text=True)

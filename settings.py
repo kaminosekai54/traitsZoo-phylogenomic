@@ -3,7 +3,8 @@ settings ={
 "rawData": "rawData/",
 "data": "data/"
 },
-"referenceProteom":"Amphibalanus-amphitrite",
+# "referenceProteom":"Amphibalanus-amphitrite",
+"referenceProteom":"Tigriopus-japonicus",
 # "referenceProteom":"Oithona-nana",
 "pathToTrimal": "~/trimAl/source/"
 }
@@ -19,7 +20,7 @@ settings["path"]["filteredRBH"] = settings["path"]["RBH"] + "filtered/"
 settings["path"]["alignments"]= settings["path"]["data"] + "alignments/"
 settings["path"]["rawAlignments"]= settings["path"]["alignments"] + "raw/"
 settings["path"]["trimmedAlignments"]= settings["path"]["alignments"] + "trimmed/"
-settings["path"]["trees"] =settings["path"]["data"] + "trees/",
+settings["path"]["trees"]= settings["path"]["data"] + "trees/"
 
 
 def getSettings(): return settings
