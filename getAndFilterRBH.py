@@ -104,7 +104,6 @@ def createRBHFile(args):
     fileName = row["qseqid"] + "_rbhs_pep.fasta" 
     SeqIO.write(reccordList, outputFolder+ fileName, "fasta-2line")
     t2 = time.time()
-    # print("RBH Fasta created : " + settings["path"]["RBH"] + fileName + " in " + str((t2-t1)/60) + " sec")
     return fileName
 
 # function createAllRBHFile,
