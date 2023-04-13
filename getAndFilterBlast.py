@@ -22,8 +22,8 @@ def indexFile(refFile):
     if os.path.isfile(refFile):
         t1 = time.time()
         file= refFile[refFile.rfind("/")+1: refFile.rfind(".")]
+        # cmd = ["./diamond", "makedb", "--in", refFile, "-d", settings["path"]["indexedFiles"] + file]
         cmd = ["diamond", "makedb", "--in", refFile, "-d", settings["path"]["indexedFiles"] + file]
-        # cmd = ["makeblastdb", "-dbtype", "prot", "-in", refFile, "-out", settings["path"]["indexedFiles"] + file]
         # print(cmd)
 
         child= subprocess.check_output(cmd, text=True)
@@ -54,9 +54,8 @@ def blastRefToOther(dbFile, querryFile= settings["path"]["renamedFasta"]+ settin
         if querryFile[querryFile.rfind("/") +1 :querryFile.rfind(".")] in dbFile: return
         t1 = time.time()
         outputFile=settings["path"]["diamondMatchs"] + querryFile[querryFile.rfind("/")+1: querryFile.rfind(".")] + "-matchs-in-" + dbFile[dbFile.rfind("/")+1: dbFile.rfind(".")] + ".tsv"
-        # cmd = ["./diamond", "blastp", "-q", querryFile, "-d", dbFile, "-o", outputFile, "--max-target-seqs", "1", "--outfmt", "6", "qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"]
+        # cmd = ["./diamond", "blastp", "--very-sensitive", "-q", querryFile, "-d", dbFile, "-o", outputFile, "--max-target-seqs", "1", "--outfmt", "6", "qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"]
         cmd = ["diamond", "blastp", "--very-sensitive", "-q", querryFile, "-d", dbFile, "-o", outputFile, "--max-target-seqs", "1", "--outfmt", "6", "qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"]
-        # cmd = ["blastp", "-seg", "yes", "-soft_masking", "true", "-use_sw_tback", "-db", dbFile, "-query", querryFile, "-out", outputFile, "-max_target_seqs", "1", "-outfmt", "6", "qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"]
         # print(cmd)
 
         child= subprocess.check_output(cmd , text=True)
@@ -74,10 +73,11 @@ def blastRefToOther(dbFile, querryFile= settings["path"]["renamedFasta"]+ settin
 # @querryFile, the file to use as querry, 
 def blastOtherToRef(querryFile, dbFile= settings["path"]["indexedFiles"]+ settings["referenceProteom"] + "_pep.dmnd"):
     if os.path.isfile(querryFile) and os.path.isfile(dbFile):
+        
         if querryFile[querryFile.rfind("/") +1 :querryFile.rfind(".")] in dbFile: return
         t1 = time.time()
         outputFile=settings["path"]["diamondMatchs"] + querryFile[querryFile.rfind("/")+1: querryFile.rfind(".")] + "-matchs-in-" + dbFile[dbFile.rfind("/")+1: dbFile.rfind(".")] + ".tsv"
-        # cmd = ["./diamond", "blastp", "-q", querryFile, "-d", dbFile, "-o", outputFile, "--max-target-seqs", "1", "--outfmt", "6", "qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"]
+        # cmd = ["./diamond", "blastp", "--very-sensitive", "-q", querryFile, "-d", dbFile, "-o", outputFile, "--max-target-seqs", "1", "--outfmt", "6", "qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"]
         cmd = ["diamond", "blastp", "--very-sensitive", "-q", querryFile, "-d", dbFile, "-o", outputFile, "--max-target-seqs", "1", "--outfmt", "6", "qseqid","sseqid","qlen","slen","length","ppos","pident","evalue","bitscore","full_qseq","full_sseq"]
         # print(cmd)
 
@@ -104,7 +104,7 @@ def allBlastSearch():
 # main function
 def main():
     if len(sys.argv) == 1 :
-        indexAllFile()
+        # indexAllFile()
         allBlastSearch()
     elif len(sys.argv) == 2:
         indexFile(sys.argv[1])

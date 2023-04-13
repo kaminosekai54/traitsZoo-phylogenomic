@@ -6,7 +6,8 @@ settings ={
 # "referenceProteom":"Amphibalanus-amphitrite",
 "referenceProteom":"Tigriopus-japonicus",
 # "referenceProteom":"Oithona-nana",
-"pathToTrimal": "~/trimAl/source/"
+# "pathToTrimal": "trimAl/source/"
+"pathToTrimal": "/home/genouest/cea/aculpintrimAl/source/"
 }
 
 settings["path"]["renamedFasta"] = settings["path"]["data"] + "fastaFiles/"
@@ -20,6 +21,7 @@ settings["path"]["filteredRBH"] = settings["path"]["RBH"] + "filtered/"
 settings["path"]["alignments"]= settings["path"]["data"] + "alignments/"
 settings["path"]["rawAlignments"]= settings["path"]["alignments"] + "raw/"
 settings["path"]["trimmedAlignments"]= settings["path"]["alignments"] + "trimmed/"
+settings["path"]["alignmentsLogs"]= settings["path"]["alignments"] + "logs/"
 settings["path"]["trees"]= settings["path"]["data"] + "trees/"
 
 
