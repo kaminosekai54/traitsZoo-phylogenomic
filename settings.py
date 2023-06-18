@@ -1,3 +1,4 @@
+import os
 settings ={
 "path" : {
 "rawData": "rawData/",
@@ -7,9 +8,10 @@ settings ={
 "referenceProteom":"Tigriopus-japonicus",
 # "referenceProteom":"Oithona-nana",
 # "pathToTrimal": "trimAl/source/"
-"pathToTrimal": "/home/genouest/cea/aculpintrimAl/source/"
+"pathToTrimal": "/home/genouest/cea/aculpin/trimAl/source/"
 }
 
+settings["path"]["figures"] = settings["path"]["data"] + "figures/"
 settings["path"]["renamedFasta"] = settings["path"]["data"] + "fastaFiles/"
 settings["path"]["tblFiles"] = settings["path"]["data"] + "tblFiles/"
 settings["path"]["indexedFiles"] =  settings["path"]["data"] + "indexedFiles/"
@@ -25,4 +27,7 @@ settings["path"]["alignmentsLogs"]= settings["path"]["alignments"] + "logs/"
 settings["path"]["trees"]= settings["path"]["data"] + "trees/"
 
 
-def getSettings(): return settings
+def getSettings():
+    for k,v in settings["path"].items(): 
+        if not os.path.isdir(settings["path"][k]) : os.mkdir(settings["path"][k])
+    return settings

@@ -5,7 +5,9 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from multiprocessing import Pool
+import psutil
 import settings
+
 ################################################################################
 settings= settings.getSettings()
 
@@ -50,13 +52,18 @@ def concatAllRBH():
 def generateTree(concatenatedAlignmentFile):
     if os.path.isfile(concatenatedAlignmentFile):
         outputFile= concatenatedAlignmentFile.replace("fasta", "tree")
+        
 
-        cmd = ["raxmlHPC", "-f","a","-m","PROTGAMMAAUTO","-p","12345","-x","12345","-#","100","-s", concatenatedAlignmentFile,"-n", outputFile]
+        cmd = ["raxmlHPC-PTHREADS", "-T", psutil.cpu_count(), "-f", "a", "-m", "PROTGAMMAAUTO", "-p", "12345", "-x", "12345", "-#", "100", "-s", concatenatedAlignmentFile[concatenatedAlignmentFile.rfind("/")+1:], "-n", outputFile[outputFile.rfind("/")+1:]]
+        wd = os.getcwd()
+        os.chdir(settings["path"]["trees"])
+        
 
         child= subprocess.check_output(cmd , text=True)
+        os.chdir(wd)
         # print(child)
     else: print("concatenated file not found : ", concatenatedAlignmentFile)
 
 if __name__ == '__main__':
     concatenatedAlignmentFile = concatAllRBH()
-    #generateTree(concatenatedAlignmentFile)
+    generateTree(concatenatedAlignmentFile)

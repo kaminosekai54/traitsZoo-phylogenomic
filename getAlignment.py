@@ -8,7 +8,9 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio import AlignIO
 import numpy as np
-
+import matplotlib.pyplot as plt
+import seaborn as sns
+from collections import Counter
 
 ################################################################################
 settings= settings.getSettings()
@@ -95,7 +97,7 @@ def evaluateTrimming(trimmedFile, rawFile):
     trimmedDf["gapCount"] = trimmedDf.aligned_seq.apply(lambda x : str(x).count("-"))
     trimmedDf["sequenceLength"] = trimmedDf.iloc[:, 1].str.len()
     trimmedDf["gapPercentage"] = trimmedDf["gapCount"] / trimmedDf["sequenceLength"] * 100
-    trimmedDf["gapPercentage"] = trimmedDf["gapPercentage"] .round(2)
+    trimmedDf["gapPercentage"] = trimmedDf["gapPercentage"] .round(0)
     # print(trimmedDf)
 
     # Find the IDs of sequences with gap percentage more than 2 standard deviations from the mean
@@ -104,7 +106,7 @@ def evaluateTrimming(trimmedFile, rawFile):
     threshold = mean_gap_pct + 2 * std_gap_pct
 
     outlier_ids = trimmedDf.loc[trimmedDf["gapPercentage"] > threshold, "seqId"].tolist()
-    trimmingData["meanGapePerc"] = round(mean_gap_pct, 2)
+    trimmingData["meanGapePerc"] = round(mean_gap_pct, 0)
     trimmingData["gapePercOutliers"] = outlier_ids
     trimmingDataLog =""
     for k,v in trimmingData.items() : trimmingDataLog += f"{k} : {v} \n"
@@ -181,16 +183,16 @@ def evalAllTrimming():
     keep75 = []
     keep100 = []
     speciesIssueCount = {species[:species .find("_")] :0 for species in os.listdir(settings["path"]["renamedFasta"])}
-    finalSummary = {"index":[], "nbBlockStrickt":[], "nbBlockPermisif":[], "rawLength":[], "trimmedLength":[], "keeptSeqPerc":[], "meanGapePerc":[], "meanGapePercOutliers":[]}
+    finalSummary = {"species":[], "nbBlockStrickt":[], "nbBlockPermisif":[], "rawLength":[], "trimmedLength":[], "keeptSeqPerc":[], "meanGapePerc":[], "meanGapePercOutliers":[]}
     for data, perc, file in res:
-        finalSummary["index"].append(file[file.rfind("/"):file.find("rbhs")])
+        finalSummary["species"].append(file[file.rfind("/")+1:file.find("rbhs")])
         finalSummary["nbBlockStrickt"].append(data["nbBlock_strict"])
         finalSummary["nbBlockPermisif"].append(data["nbBlock_permisif"])
         finalSummary["rawLength"].append(data["rawLength"])
         finalSummary["trimmedLength"].append(data["trimmedLength"])
         finalSummary["meanGapePerc"].append(data["meanGapePerc"])
         finalSummary["meanGapePercOutliers"].append(data["gapePercOutliers"])
-        finalSummary["keeptSeqPerc"].append(perc)
+        finalSummary["keeptSeqPerc"].append(round(perc, 0))
         for species in data["gapePercOutliers"]: speciesIssueCount[species] +=1
 
 
@@ -216,7 +218,88 @@ def evalAllTrimming():
     speciesIssueCountDf= speciesIssueCountDf.sort_values(by='nbTimeCauseIssue', ascending=False)
     speciesIssueCountDf .to_csv(settings["path"]["alignmentsLogs"] +"speciesOutliersSummary.csv", sep="\t", index=False)
 
+def plotAlignmentTrimingDistribution(logFile = settings["path"]["alignmentsLogs"] +"finalTrimmingMetricSummary.csv"):
+    df = pd.read_csv(logFile, sep="\t")
+    # Set the figure size
+    plt.figure(figsize=(8, 6))
+    # Build the distributions using Counter
+    trimmed_counter = Counter(df['trimmedLength'])
+    raw_counter = Counter(df['rawLength'])
+
+    purple = '#8E44AD'
+    complementary_color = '#7F7F7F'
+    yellow = '#F4D03F'
+    overlapping_color = 'black'  # Light purple
+
+
+    # Plot the histograms using seaborn
+    sns.histplot(data=df['rawLength'], color=yellow, alpha=0.7, label='rawLength')
+    sns.histplot(data=df['trimmedLength'], color=purple, alpha=0.6, label='trimmedLength')
+    
+    
+    # Add markers for minimum, maximum, mean, and median of each distribution
+    # plt.axvline(df['trimmedLength'].min(), color='red', linestyle='--', label='Trimmed Min')
+    # plt.axvline(df['trimmedLength'].max(), color='green', linestyle='--', label='Trimmed Max')
+    # plt.axvline(np.mean(df['trimmedLength']), color='blue', linestyle='--', label='Trimmed Mean')
+    plt.axvline(np.median(df['trimmedLength']), color='purple', linestyle='--', label='Trimmed Median')
+
+    # plt.axvline(df['rawLength'].min(), color='orange', linestyle='--', label='Raw Min')
+    # plt.axvline(df['rawLength'].max(), color='brown', linestyle='--', label='Raw Max')
+    # plt.axvline(np.mean(df['rawLength']), color='black', linestyle='--', label='Raw Mean')
+    plt.axvline(np.median(df['rawLength']), color='gray', linestyle='--', label='Raw Median')
+
+        # Calculate statistical measures
+    trimmed_mean = np.mean(df['trimmedLength'])
+    raw_mean = np.mean(df['rawLength'])
+    trimmed_median = np.median(df['trimmedLength'])
+    raw_median = np.median(df['rawLength'])
+    trimmed_mode = np.argmax(list(trimmed_counter.values()))
+    raw_mode = np.argmax(list(raw_counter.values()))
+    trimmed_std = np.std(df['trimmedLength'])
+    raw_std = np.std(df['rawLength'])
+
+    # Print all possible information
+    # print('Trimmed Length Distribution:', dict(trimmed_counter))
+    # print('Raw Length Distribution:', dict(raw_counter))
+    print('---------------------------------')
+    print('Trimmed Length Mean:', trimmed_mean)
+    print('Raw Length Mean:', raw_mean)
+    print('---------------------------------')
+    print('Trimmed Length Median:', trimmed_median)
+    print('Raw Length Median:', raw_median)
+
+    # Set the x-axis limits based on the maximum and minimum values of the distributions
+    min_value = min(df['rawLength'].min(), df['trimmedLength'].min())
+    max_value = max(df['rawLength'].max(), df['trimmedLength'].max())
+    plt.xlim(min_value, max_value)
+    plt.xscale('log')
+
+
+    # print(min_value )
+    # print(max_value)
+
+    # Add labels and title
+    plt.xlabel('Length on a log scall')
+    plt.ylabel('Frequency')
+    plt.title('Distribution of Raw Length and Trimmed Length')
+
+    # Display legend
+    plt.legend()
+
+    # Save the plot as a vectorized image (SVG or PDF)
+    plt.savefig(settings["path"]["figures"] + 'alignment_trimming_distribution.svg', format='svg', dpi=300, bbox_inches='tight')
+    plt.savefig(settings["path"]["figures"] + 'alignment_trimming_distribution.pdf', format='pdf', dpi=300, bbox_inches='tight')
+    print("total length before triming : ", df.rawLength.sum())
+    print("total length after triming : ", df.trimmedLength.sum())
+    print("smaller seq before trimming :", df.rawLength.min())
+    print("longer seq before trimming :", df.rawLength.max())
+    print("smaller seq after trimming :", df.trimmedLength.min())
+    print("longer seq after trimming :", df.trimmedLength.max())
+
+    plt.show()
+    
 if __name__ == '__main__':
-    # alignAll()
-    # trimAllAlignment()
+    alignAll()
+    trimAllAlignment()
     evalAllTrimming()
+    plotAlignmentTrimingDistribution()

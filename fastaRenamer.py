@@ -9,6 +9,7 @@ import settings
 
 ################################################################################
 settings = settings.getSettings()
+# seqIdDict = {}
 
 
 ################################################################################
@@ -23,8 +24,16 @@ settings = settings.getSettings()
 # @fastaFile, path to the fasta to read
 # @return, a dictionnary like {seqID:seq}
 def fastaToDict(fastaFile):
-    speciesName = fastaFile[fastaFile.rfind("/")+1: fastaFile.find("_")]
-    return {speciesName+ "_" + str(i) : record.seq for i, record in enumerate(SeqIO.parse(fastaFile, "fasta"))}
+    if "_" in fastaFile: speciesName = fastaFile[fastaFile.rfind("/")+1: fastaFile.find("_")]
+    else: speciesName = fastaFile[fastaFile.rfind("/")+1: fastaFile.find(".")]
+    # speciesName = fastaFile[fastaFile.rfind("/")+1: fastaFile.find("_")]
+    dictFasta = {}
+    seqIdDict = {}
+    for i, record in enumerate(SeqIO.parse(fastaFile, "fasta")):
+        dictFasta[speciesName+ "_" + str(i+1)] = record.seq
+        seqIdDict[speciesName+ "_" + str(i+1)] = record.id
+    # speciesName+ "_" + str(i+1) : record.seq for i, record in enumerate(SeqIO.parse(fastaFile, "fasta"))}
+    return dictFasta, seqIdDict  
 
 
 # function fastaToTSV,
@@ -33,29 +42,30 @@ def fastaToDict(fastaFile):
 # @fastaFile, path to the fasta to convert
 # @fastaDict, dictionnary {seqID:sequence}, if provided, the function will use it instead of re reading the fasta
 def fastaToTSV(fastaFile, fastaDict= {}):
-    speciesName = fastaFile[fastaFile.rfind("/"): fastaFile.find("_")]
+    if "_" in fastaFile: speciesName = fastaFile[fastaFile.rfind("/")+1: fastaFile.find("_")]
+    else: speciesName = fastaFile[fastaFile.rfind("/")+1: fastaFile.find(".")]
+    # speciesName = fastaFile[fastaFile.rfind("/"): fastaFile.find("_")]
     file= fastaFile[fastaFile.rfind("/"): fastaFile.rfind(".")]
     dict = {}
-    if len(fastaDict) == 0: dict = fastaToDict(fastaFile)
-    # check if we have to read the fasta
+    if len(fastaDict) == 0: dict = fastaToDict(fastaFile)[0]
     else : dict = fastaDict
     
     dict = {"seqId": dict.keys(), "sequence": dict.values()}
     df = pd.DataFrame.from_dict(dict)
-    if not os.path.isdir(settings["path"]["data"]) : os.mkdir(settings["path"]["data"])
-    if not os.path.isdir(settings["path"]["tblFiles"]) : os.mkdir(settings["path"]["tblFiles"])
     df.to_csv(settings["path"]["tblFiles"] + speciesName + "_pep.tsv", sep= "\t", index=False)
     # print("tbl convertion done for ", fastaFile)
 
 # function renameSeqInFasta,
-# this function write the the fasta file with the reanmed sequenceID
+# this function write the fasta file with the renamed sequenceID
 # @param,
 # @fastaFile, path to the fasta to 
 def renameSeqInFasta(fastaFile, fastaDict={}):
-    speciesName = fastaFile[fastaFile.rfind("/"): fastaFile.find("_")]
+    if "_" in fastaFile: speciesName = fastaFile[fastaFile.rfind("/")+1: fastaFile.find("_")]
+    else: speciesName = fastaFile[fastaFile.rfind("/")+1: fastaFile.find(".")]
+    # speciesName = fastaFile[fastaFile.rfind("/"): fastaFile.find("_")]
     file= fastaFile[fastaFile.rfind("/"): fastaFile.rfind(".")]
     dict = {}
-    if len(fastaDict) == 0 : dict = fastaToDict(fastaFile)
+    if len(fastaDict) == 0 : dict = fastaToDict(fastaFile)[0]
     else : dict = fastaDict
     
     df = pd.DataFrame(zip(dict.keys(), dict.values()))
@@ -74,20 +84,25 @@ def renameSeqInFasta(fastaFile, fastaDict={}):
 # @param
 # @fastaFile, the file to process
 def processFile(fastaFile):
-    fastaDict = fastaToDict(fastaFile)
+    fastaDict, seqIdDict = fastaToDict(fastaFile)
     renameSeqInFasta(fastaFile, fastaDict)
     fastaToTSV(fastaFile, fastaDict)
-    return
+    return seqIdDict
         
 # function convertAll,
 # this function apply parallely the processFiles function on all the file found in the rawData folder
 def convertAll():
     t1 = time.time()
+    listDict = []
     with Pool() as p:
-        p.map(processFile, [settings["path"]["rawData"] +file for file in os.listdir(settings["path"]["rawData"])])
+        listDict= p.map(processFile, [settings["path"]["rawData"] +file for file in os.listdir(settings["path"]["rawData"])])
     t2= time.time()
-    print("all file renamed in " + str((t2-t1)/60) + " sec")
+    seqIdDict = {key: value for d in listDict for key, value in d.items()}
 
+    df = pd.DataFrame.from_dict({"newId":seqIdDict .keys(), "oldId": seqIdDict .values()})
+    df.to_csv(settings["path"]["tblFiles"] + "renamedIdList.tsv", sep= "\t", index=False)
+    print("all file renamed in " + str((t2-t1)/60) + " sec")
+    
 
 # main function
 def main():

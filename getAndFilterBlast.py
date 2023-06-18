@@ -104,7 +104,7 @@ def allBlastSearch():
 # main function
 def main():
     if len(sys.argv) == 1 :
-        # indexAllFile()
+        indexAllFile()
         allBlastSearch()
     elif len(sys.argv) == 2:
         indexFile(sys.argv[1])

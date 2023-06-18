@@ -6,6 +6,7 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from multiprocessing import Pool
 import settings
+
 ################################################################################
 settings= settings.getSettings()
 
