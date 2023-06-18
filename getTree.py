@@ -54,14 +54,18 @@ def generateTree(concatenatedAlignmentFile):
         outputFile= concatenatedAlignmentFile.replace("fasta", "tree")
         
 
-        cmd = ["raxmlHPC-PTHREADS", "-T", psutil.cpu_count(), "-f", "a", "-m", "PROTGAMMAAUTO", "-p", "12345", "-x", "12345", "-#", "100", "-s", concatenatedAlignmentFile[concatenatedAlignmentFile.rfind("/")+1:], "-n", outputFile[outputFile.rfind("/")+1:]]
+        cmd = ["raxmlHPC-PTHREADS", "-T", str(psutil.cpu_count()), "-f", "a", "-m", "PROTGAMMAAUTO", "-p", "12345", "-x", "12345", "-#", "100", "-s", concatenatedAlignmentFile[concatenatedAlignmentFile.rfind("/")+1:], "-n", outputFile[outputFile.rfind("/")+1:]]
+        print(cmd)
         wd = os.getcwd()
+        print(os.getcwd())
         os.chdir(settings["path"]["trees"])
+        print(os.getcwd())
         
 
         child= subprocess.check_output(cmd , text=True)
         os.chdir(wd)
-        # print(child)
+        print(child)
+        print(os.getcwd())
     else: print("concatenated file not found : ", concatenatedAlignmentFile)
 
 if __name__ == '__main__':
