@@ -81,9 +81,6 @@ def finalFilter(df, colNotToMerge, outputFolder = settings["path"]["filteredRBH"
     df = df.assign(nbRBH = df.sseqid.apply(lambda x : len(x)))
     df = df[df.nbRBH == nbRBHRequiered]
 
-    if not os.path.isdir(settings["path"]["data"]) : os.mkdir(settings["path"]["data"])
-    if not os.path.isdir(settings["path"]["RBH"]) : os.mkdir(settings["path"]["RBH"])
-    if not os.path.isdir(outputFolder) : os.mkdir(outputFolder)
     df.to_csv(outputFolder+ "full_rbh_tab.tsv", sep="\t", index=False)
     return df[["qseqid","sseqid","full_qseq","full_sseq"]]
 
@@ -99,9 +96,6 @@ def createRBHFile(args):
     for seqId, sSeq in zip(row["sseqid"], row["full_sseq"]):
         reccordList.append(SeqRecord(Seq(sSeq), id = seqId, description=""))
 
-    if not os.path.isdir(settings["path"]["data"]) : os.mkdir(settings["path"]["data"])
-    if not os.path.isdir(settings["path"]["RBH"]) : os.mkdir(settings["path"]["RBH"])
-    if not os.path.isdir(outputFolder) : os.mkdir(outputFolder)
     fileName = row["qseqid"] + "_rbhs_pep.fasta" 
     SeqIO.write(reccordList, outputFolder+ fileName, "fasta-2line")
     t2 = time.time()

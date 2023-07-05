@@ -26,8 +26,6 @@ def getDictFromFasta(fastaFile):
 # this function read all RBH file into a dict and concatenate them 
 # Finally it create a big concatenated fasta.
 def concatAllRBH():
-    if not os.path.isdir(settings["path"]["data"]) : os.mkdir(settings["path"]["data"])
-    if not os.path.isdir(settings["path"]["trees"]) : os.mkdir(settings["path"]["trees"])
     t1 = time.time()
     dictList = []
     concatDict= {}

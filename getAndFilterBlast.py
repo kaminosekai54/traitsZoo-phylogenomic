@@ -17,8 +17,6 @@ settings= settings.getSettings()
 # @param,
 # @refFile, reference file to index
 def indexFile(refFile):
-    # if not os.path.isdir(settings["path"]["data"]) : os.mkdir(settings["path"]["data"])
-    # if not os.path.isdir(settings["path"]["indexedFiles"]) : os.mkdir(settings["path"]["indexedFiles"])
     if os.path.isfile(refFile):
         t1 = time.time()
         file= refFile[refFile.rfind("/")+1: refFile.rfind(".")]
@@ -90,8 +88,6 @@ def blastOtherToRef(querryFile, dbFile= settings["path"]["indexedFiles"]+ settin
 # this function will perform the blast search from proteom to other file and the oposit
 # in a parallele way
 def allBlastSearch():
-    if not os.path.isdir(settings["path"]["data"]) : os.mkdir(settings["path"]["data"])
-    if not os.path.isdir(settings["path"]["diamondMatchs"]) : os.mkdir(settings["path"]["diamondMatchs"])
     t1 = time.time()
     with Pool() as p:
         p.map(blastRefToOther, [settings["path"]["indexedFiles"] + file for file in os.listdir(settings["path"]["indexedFiles"])])
@@ -109,6 +105,8 @@ def main():
     elif len(sys.argv) == 2:
         indexFile(sys.argv[1])
     elif len(sys.argv) == 3:
+        indexFile(sys.argv[1])
+        indexFile(sys.argv[2])
         blastRefToOther(sys.argv[2], sys.argv[1])
         blastOtherToRef(sys.argv[1], sys.argv[2])
     return

@@ -34,9 +34,6 @@ def aligneSequenceWithMafft(fasta, outputFolder=settings["path"]["rawAlignments"
 # this function process all the alignment,
 # in a parallele way
 def alignAll():
-    if not os.path.isdir(settings["path"]["data"]) : os.mkdir(settings["path"]["data"])
-    if not os.path.isdir(settings["path"]["alignments"]) : os.mkdir(settings["path"]["alignments"])
-    if not os.path.isdir(settings["path"]["rawAlignments"]) : os.mkdir(settings["path"]["rawAlignments"])
     t1 = time.time()
     with Pool() as p:
         p.map(aligneSequenceWithMafft, [settings["path"]["filteredRBH"]+ file for file in os.listdir(settings["path"]["filteredRBH"]) if file.endswith(".fasta")])
@@ -53,9 +50,6 @@ def trimAlignment(alignmentFile, outputFolder=settings["path"]["trimmedAlignment
     else: print("one of the file is missing")
 
 def trimAllAlignment():
-    if not os.path.isdir(settings["path"]["data"]) : os.mkdir(settings["path"]["data"])
-    if not os.path.isdir(settings["path"]["alignments"]) : os.mkdir(settings["path"]["alignments"])
-    if not os.path.isdir(settings["path"]["trimmedAlignments"]) : os.mkdir(settings["path"]["trimmedAlignments"])
     t1 = time.time()
     with Pool() as p:
         p.map(trimAlignment, [settings["path"]["rawAlignments"]+ file for file in os.listdir(settings["path"]["rawAlignments"]) if file.endswith(".fasta")])
@@ -162,7 +156,6 @@ def findBlockInMSA(trimmedDf, consensus_threshold , min_block_size,  trimmingDat
     return log
 
 def evalAllTrimming():
-    if not os.path.isdir(settings["path"]["alignmentsLogs"]): os.makedirs(settings["path"]["alignmentsLogs"])
     couple = []
     trimmedFiles = os.listdir(settings["path"]["trimmedAlignments"])
     rawFiles = os.listdir(settings["path"]["rawAlignments"])
