@@ -1,4 +1,4 @@
-name: /home/genouest/cea/aculpin/pipeline
+name: pipelinePhylo
 channels:
   - anaconda
   - conda-forge
