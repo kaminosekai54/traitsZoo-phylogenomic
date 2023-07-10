@@ -24,8 +24,11 @@ settings = settings.getSettings()
 # @fastaFile, path to the fasta to read
 # @return, a dictionnary like {seqID:seq}
 def fastaToDict(fastaFile):
-    if "_" in fastaFile: speciesName = fastaFile[fastaFile.rfind("/")+1: fastaFile.find("_")]
-    else: speciesName = fastaFile[fastaFile.rfind("/")+1: fastaFile.find(".")]
+    fileOnly = fastaFile[fastaFile.rfind("/")+1:] 
+    if "_" in fileOnly: speciesName = fileOnly[: fileOnly.find("_")]
+    else: speciesName = fileOnly[: fileOnly.find(".")]
+    # if "_" in fastaFile: speciesName = fastaFile[fastaFile.rfind("/")+1: fastaFile.find("_")]
+    # else: speciesName = fastaFile[fastaFile.rfind("/")+1: fastaFile.find(".")]
     # speciesName = fastaFile[fastaFile.rfind("/")+1: fastaFile.find("_")]
     dictFasta = {}
     seqIdDict = {}
@@ -42,8 +45,9 @@ def fastaToDict(fastaFile):
 # @fastaFile, path to the fasta to convert
 # @fastaDict, dictionnary {seqID:sequence}, if provided, the function will use it instead of re reading the fasta
 def fastaToTSV(fastaFile, fastaDict= {}):
-    if "_" in fastaFile: speciesName = fastaFile[fastaFile.rfind("/")+1: fastaFile.find("_")]
-    else: speciesName = fastaFile[fastaFile.rfind("/")+1: fastaFile.find(".")]
+    fileOnly = fastaFile[fastaFile.rfind("/")+1:] 
+    if "_" in fileOnly: speciesName = fileOnly[: fileOnly.find("_")]
+    else: speciesName = fileOnly[: fileOnly.find(".")]
     # speciesName = fastaFile[fastaFile.rfind("/"): fastaFile.find("_")]
     file= fastaFile[fastaFile.rfind("/"): fastaFile.rfind(".")]
     dict = {}
@@ -60,8 +64,11 @@ def fastaToTSV(fastaFile, fastaDict= {}):
 # @param,
 # @fastaFile, path to the fasta to 
 def renameSeqInFasta(fastaFile, fastaDict={}):
-    if "_" in fastaFile: speciesName = fastaFile[fastaFile.rfind("/")+1: fastaFile.find("_")]
-    else: speciesName = fastaFile[fastaFile.rfind("/")+1: fastaFile.find(".")]
+    fileOnly = fastaFile[fastaFile.rfind("/")+1:] 
+    if "_" in fileOnly: speciesName = fileOnly[: fileOnly.find("_")]
+    else: speciesName = fileOnly[: fileOnly.find(".")]
+    # if "_" in fastaFile: speciesName = fastaFile[fastaFile.rfind("/")+1: fastaFile.find("_")]
+    # else: speciesName = fastaFile[fastaFile.rfind("/")+1: fastaFile.find(".")]
     # speciesName = fastaFile[fastaFile.rfind("/"): fastaFile.find("_")]
     file= fastaFile[fastaFile.rfind("/"): fastaFile.rfind(".")]
     dict = {}
@@ -69,8 +76,8 @@ def renameSeqInFasta(fastaFile, fastaDict={}):
     else : dict = fastaDict
     
     df = pd.DataFrame(zip(dict.keys(), dict.values()))
-    if not os.path.isdir(settings["path"]["data"]) : os.mkdir(settings["path"]["data"])
-    if not os.path.isdir(settings["path"]["renamedFasta"]) : os.mkdir(settings["path"]["renamedFasta"])
+    # if not os.path.isdir(settings["path"]["data"]) : os.mkdir(settings["path"]["data"])
+    # if not os.path.isdir(settings["path"]["renamedFasta"]) : os.mkdir(settings["path"]["renamedFasta"])
     df.to_csv(settings["path"]["renamedFasta"] + speciesName + ".tab", sep= "\t", index=False, header=False)
     SeqIO.convert(settings["path"]["renamedFasta"]+ speciesName + ".tab", 'tab', settings["path"]["renamedFasta"]  + speciesName+ "_pep.fasta", 'fasta-2line')
     os.remove(settings["path"]["renamedFasta"] + speciesName + ".tab")
