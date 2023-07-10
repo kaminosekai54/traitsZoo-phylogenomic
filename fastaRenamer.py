@@ -95,7 +95,7 @@ def convertAll():
     t1 = time.time()
     listDict = []
     with Pool() as p:
-        listDict= p.map(processFile, [settings["path"]["rawData"] +file for file in os.listdir(settings["path"]["rawData"])])
+        listDict= p.map(processFile, [settings["path"]["rawData"] +file for file in os.listdir(settings["path"]["rawData"]) if os.path.isfile(settings["path"]["rawData"] + file)])
     t2= time.time()
     seqIdDict = {key: value for d in listDict for key, value in d.items()}
 
