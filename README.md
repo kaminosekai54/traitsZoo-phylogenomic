@@ -6,6 +6,20 @@ A setting file is also provided  for small customisation.
 
 The work flow of the pipeline is the following :
 
+
+#Environement
+You need to have several package installed,
+- pandas
+-biopython
+- matplotlib
+- seaborn
+- numpy
+
+You can also use the ** environement.yml ** provided like that :
+`conda env create -f environment.yml`
+ 
+You might need to change the environement name in the yml file to fit your own path.
+
 # Usage :
 Put your proteom file (fasta format) in the rawData folder.
 The file should start by the species name :

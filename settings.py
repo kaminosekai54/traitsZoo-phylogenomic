@@ -4,10 +4,7 @@ settings ={
 "rawData": "rawData/",
 "data": "data/"
 },
-# "referenceProteom":"Amphibalanus-amphitrite",
 "referenceProteom":"Tigriopus-japonicus",
-# "referenceProteom":"Oithona-nana",
-# "pathToTrimal": "trimAl/source/"
 "pathToTrimal": "/home/genouest/cea/aculpin/trimAl/source/"
 }
 
