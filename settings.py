@@ -5,7 +5,13 @@ settings ={
 "data": "data/"
 },
 "referenceProteom":"Tigriopus-japonicus",
-"pathToTrimal": "/home/genouest/cea/aculpin/trimAl/source/"
+"pathToTrimal": "/home/genouest/cea/aculpin/trimAl/source/",
+"trimingParameter": {
+    "-gt": "0.9", 
+    "-cons": "25", 
+    "-w": "3", 
+    "-st": "0.001",
+}
 }
 
 settings["path"]["figures"] = settings["path"]["data"] + "figures/"
