@@ -116,9 +116,7 @@ def main():
     if len(sys.argv) == 1 :
         convertAll() 
     elif len(sys.argv) == 2:
-        fastaDict = fastaToDict(sys.argv[1])
-        renameSeqInFasta(sys.argv[1], fastaDict)
-        fastaToTSV(sys.argv[1], fastaDict)
+        processFile(sys.argv[1])
     elif len(sys.argv) == 3:
         if int(sys.argv[2]) == 1: renameSeqInFasta(sys.argv[1])
         elif int(sys.argv[2]) == 2 : fastaToTSV(sys.argv[1])

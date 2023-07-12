@@ -45,6 +45,8 @@ def trimAlignment(alignmentFile, outputFolder=settings["path"]["trimmedAlignment
         outputFile= outputFolder + alignmentFile[alignmentFile.rfind("/")+1:-6] + "_trimmed.fasta"
 
         cmd = [settings["pathToTrimal"] + "trimal", "-in", alignmentFile, "-out", outputFile, "-gt", "0.9", "-cons", "25", "-w", "3", "-st", "0.001"]
+        print("trimming command :")
+        print(" ".join(cmd))
         child= subprocess.check_output(cmd , text=True)
         # print(child)
     else: print("one of the file is missing")
