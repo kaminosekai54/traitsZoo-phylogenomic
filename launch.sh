@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --job-name=raxmlTest
-#SBATCH --chdir=/scratch/aculpin/traitsZoo-phylogenomic/
-#SBATCH --output=raxmlTest_log.o
-#SBATCH --error=raxmlTest_log.e
-#SBATCH --mail-user=alexis.culpin@cri-paris.org
+#SBATCH --job-name=pipePhylo
+#SBATCH --chdir=./
+#SBATCH --output=pipePhylo_log.o
+#SBATCH --error=pipePhylo_log.e
+#SBATCH --mail-user=your_email@mon_domaine.org
 #SBATCH --mail-type=none
 
 #langages
@@ -11,10 +11,10 @@
 . /softs/local/env/envpython-3.9.5.sh
 
 #tools
+conda activate pipelinePhylo
+
 . /softs/local/env/envdiamond-2.0.2.sh
 . /softs/local/env/envmafft-7.475.sh
-
-conda activate ~/pipeline
 . /softs/local/env/envraxml-8.2.12.sh
 
 python3 fastaRenamer.py

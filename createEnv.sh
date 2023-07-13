@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --chdir=/home/genouest/cea/aculpin/
+#SBATCH --chdir=./
 #SBATCH --job-name=createEnv
 #SBATCH --output=create_env.o
 #SBATCH --error=create_env.e

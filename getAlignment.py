@@ -27,6 +27,7 @@ def aligneSequenceWithMafft(fasta, outputFolder=settings["path"]["rawAlignments"
         cmd = ["mafft", "--auto", "--out", outputFile, fasta]
         child= subprocess.check_output(cmd , text=True)
         # print(child)
+        return outputFile
     else: print("one of the file is missing")
 
 
@@ -52,6 +53,7 @@ def trimAlignment(alignmentFile, outputFolder=settings["path"]["trimmedAlignment
         print(" ".join(cmd))
         child= subprocess.check_output(cmd , text=True)
         # print(child)
+        return outputFile
     else: print("one of the file is missing")
 
 def trimAllAlignment():
@@ -296,8 +298,23 @@ def plotAlignmentTrimingDistribution(logFile = settings["path"]["alignmentsLogs"
 
     plt.show()
     
+    
+def main():
+    if len(sys.argv) == 1 :
+        alignAll()
+        trimAllAlignment()
+        evalAllTrimming()
+        plotAlignmentTrimingDistribution()
+    elif len(sys.argv) == 2:
+        alignedFile = aligneSequenceWithMafft(sys.argv[1])
+        trimAlignment(alignedFile)
+    elif len(sys.argv) == 3:
+        if int(sys.argv[2]) == 1: 
+            aligneSequenceWithMafft(sys.argv[1])
+            print("alignment done")
+        elif int(sys.argv[2]) == 2 : 
+            trimAlignment(sys.argv[1])
+            print("triming done")
+
 if __name__ == '__main__':
-    alignAll()
-    trimAllAlignment()
-    evalAllTrimming()
-    plotAlignmentTrimingDistribution()
+    main()
