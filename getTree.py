@@ -50,10 +50,26 @@ def concatAllRBH():
 def generateTree(concatenatedAlignmentFile):
     if os.path.isfile(concatenatedAlignmentFile):
         outputFile= concatenatedAlignmentFile.replace("fasta", "tree")
-        
 
-        cmd = ["raxmlHPC-PTHREADS", "-T", str(psutil.cpu_count()), "-f", "a", "-m", "PROTGAMMAAUTO", "-p", "12345", "-x", "12345", "-#", "100", "-s", concatenatedAlignmentFile[concatenatedAlignmentFile.rfind("/")+1:], "-n", outputFile[outputFile.rfind("/")+1:]]
-        print(cmd)
+        cpu_affinity = len(psutil.Process().cpu_affinity())
+        cpu_count = psutil.cpu_count()
+        # Check if the process has CPU affinity set
+        if cpu_affinity > 0:
+        # Limit the CPU affinity count to the available CPU count
+            cpu_affinity = min(cpu_affinity, cpu_count)
+        else:
+            cpu_affinity = cpu_count
+        
+# Convert the final count to a string
+        cpu_affinity_str = str(cpu_affinity)
+        print("number of cpu provided : ", cpu_affinity)
+
+        cmd = ["raxmlHPC-PTHREADS", "-T", cpu_affinity_str, "-f", "a", "-m", "PROTGAMMAAUTO", "-p", "12345", "-x", "12345", "-#", "100", "-s", concatenatedAlignmentFile[concatenatedAlignmentFile.rfind("/")+1:], "-n", outputFile[outputFile.rfind("/")+1:]]
+        if cpu_affinity  < 4 :
+            print("not enough cpu provided to use the more efficiant PTHREADS version, will use the single raxmlHPC version ")
+            cmd = ["raxmlHPC", "-f", "a", "-m", "PROTGAMMAAUTO", "-p", "12345", "-x", "12345", "-#", "100", "-s", concatenatedAlignmentFile[concatenatedAlignmentFile.rfind("/")+1:], "-n", outputFile[outputFile.rfind("/")+1:]]
+            
+        print(" ".join(cmd))
         wd = os.getcwd()
         print(os.getcwd())
         os.chdir(settings["path"]["trees"])
