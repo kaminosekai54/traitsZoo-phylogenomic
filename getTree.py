@@ -82,6 +82,15 @@ def generateTree(concatenatedAlignmentFile):
         print(os.getcwd())
     else: print("concatenated file not found : ", concatenatedAlignmentFile)
 
+def main():
+    if len(sys.argv) == 1 :
+        concatenatedAlignmentFile = concatAllRBH()
+        generateTree(concatenatedAlignmentFile)
+    elif len(sys.argv) == 2:
+        if int(sys.argv[1]) == 1: concatAllRBH()
+
+    elif len(sys.argv) == 3:
+        if int(sys.argv[2]) == 1: generateTree(sys.argv[1])
+        
 if __name__ == '__main__':
-    concatenatedAlignmentFile = concatAllRBH()
-    generateTree(concatenatedAlignmentFile)
+    main()
